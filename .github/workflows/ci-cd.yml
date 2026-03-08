@@ -33,3 +33,8 @@ jobs:
           # Aqui você colocaria seu comando real de teste (ex: pytest, go test, etc)
           sleep 5
           echo "Todos os testes passaram!"
+# Exemplo: adicione uma linha de comentário no final do ci-cd.yml
+      - name: Adicionar comentário ao arquivo
+        run: |
+          echo "# Este é um comentário adicionado ao final do arquivo ci-cd.yml" >> ci-cd.yml
+          echo "Comentário adicionado com sucesso!"

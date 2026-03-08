@@ -1,0 +1,33 @@
+name: CI Main Branch
+
+# Define os gatilhos de execução
+on:
+  push:
+    branches:
+      - beta
+  pull_request:
+    branches:
+      - beta
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Faz o checkout do repositório para a máquina virtual
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      # 2. Exemplo: Configuração do ambiente (ajuste para sua linguagem)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # 3. Exemplo: Instalação de dependências
+      - name: Instalar dependências
+        run: npm install
+
+      # 4. Exemplo: Execução de testes
+      - name: Rodar Testes
+        run: npm test

@@ -1,33 +1,31 @@
-name: Validar Mensagem de Commit
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-
-jobs:
-  check-message:
+check-commit:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Necessário para ler o histórico de commits
+          fetch-depth: 0
 
-      - name: Validar tamanho da mensagem
+      - name: Validar Mensagem do Commit
         run: |
-          # Pega a mensagem do último commit
+          # Captura a mensagem do commit atual
           COMMIT_MSG=$(git log -1 --pretty=%B)
-          echo "Mensagem detectada: $COMMIT_MSG"
-          
-          # Conta os caracteres
-          MSG_LENGTH=${#COMMIT_MSG}
-          
-          if [ "$MSG_LENGTH" -lt 10 ]; then
-            echo "ERRO: Mensagem de commit muito curta ($MSG_LENGTH caracteres)."
-            echo "Por favor, descreva melhor o que foi feito (mínimo 10 caracteres)."
+          echo "Mensagem enviada: '$COMMIT_MSG'"
+
+          # Remove espaços em branco para validar o conteúdo real
+          CLEAN_MSG=$(echo "$COMMIT_MSG" | tr -d '[:space:]')
+
+          # REGRA 1: Bloqueia mensagens com menos de 5 caracteres (ajuste conforme desejar)
+          if [ ${#CLEAN_MSG} -lt 5 ]; then
+            echo "❌ ERRO: Mensagem de commit muito curta ou irrelevante."
+            echo "Por favor, descreva o que foi alterado com mais detalhes."
             exit 1
-          else
-            echo "Sucesso: Mensagem validada!"
           fi
+
+          # REGRA 2: Bloqueia especificamente o ponto "." ou mensagens apenas com símbolos
+          if [[ "$CLEAN_MSG" =~ ^[\.\-\_]+$ ]]; then
+            echo "❌ ERRO: Mensagem contendo apenas símbolos (ex: '.') não é permitida."
+            exit 1
+          fi
+
+          echo "✅ Mensagem aprovada!"

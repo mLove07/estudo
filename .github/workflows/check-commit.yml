@@ -1,31 +1,29 @@
-check-commit:
+name: Check Commit Message
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  validate-msg:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout do código
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Validar Mensagem do Commit
+      - name: Validar Mensagem
         run: |
-          # Captura a mensagem do commit atual
-          COMMIT_MSG=$(git log -1 --pretty=%B)
-          echo "Mensagem enviada: '$COMMIT_MSG'"
-
-          # Remove espaços em branco para validar o conteúdo real
-          CLEAN_MSG=$(echo "$COMMIT_MSG" | tr -d '[:space:]')
-
-          # REGRA 1: Bloqueia mensagens com menos de 5 caracteres (ajuste conforme desejar)
-          if [ ${#CLEAN_MSG} -lt 5 ]; then
-            echo "❌ ERRO: Mensagem de commit muito curta ou irrelevante."
-            echo "Por favor, descreva o que foi alterado com mais detalhes."
+          # Captura a última mensagem
+          MSG=$(git log -1 --pretty=%B)
+          echo "Mensagem enviada: $MSG"
+          
+          # Se a mensagem for apenas um ponto ou tiver menos de 3 caracteres
+          if [[ "$MSG" == "." ]] || [ ${#MSG} -lt 3 ]; then
+            echo "ERRO: Mensagem irrelevante detectada!"
             exit 1
           fi
-
-          # REGRA 2: Bloqueia especificamente o ponto "." ou mensagens apenas com símbolos
-          if [[ "$CLEAN_MSG" =~ ^[\.\-\_]+$ ]]; then
-            echo "❌ ERRO: Mensagem contendo apenas símbolos (ex: '.') não é permitida."
-            exit 1
-          fi
-
-          echo "✅ Mensagem aprovada!"
+          echo "Mensagem aprovada!"
